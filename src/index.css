@@ -2,50 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --neon-green: #00ff88;
-  --neon-purple: #6600ff;
-}
+@layer components {
+  .nav-link {
+    @apply flex items-center space-x-1 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors;
+  }
 
-body {
-  @apply bg-gray-900 text-white;
-  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-}
+  .btn-primary {
+    @apply px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200;
+  }
 
-.neon-text {
-  color: var(--neon-green);
-  text-shadow: 0 0 10px var(--neon-green),
-               0 0 20px var(--neon-green),
-               0 0 30px var(--neon-green);
-}
+  .btn-secondary {
+    @apply px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors duration-200;
+  }
 
-.neon-border {
-  border: 2px solid var(--neon-green);
-  box-shadow: 0 0 10px var(--neon-green),
-              inset 0 0 10px var(--neon-green);
-}
+  .form-input {
+    @apply w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white;
+  }
 
-.neural-button {
-  @apply relative px-6 py-3 rounded-lg bg-transparent;
-  border: 2px solid var(--neon-green);
-  transition: all 0.3s ease;
-}
-
-.neural-button:hover {
-  background: var(--neon-green);
-  color: black;
-  box-shadow: 0 0 20px var(--neon-green);
-}
-
-.holographic-card {
-  @apply relative rounded-xl p-6;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transform-style: preserve-3d;
-  transition: transform 0.6s ease;
-}
-
-.holographic-card:hover {
-  transform: rotateY(10deg) rotateX(5deg);
+  .feature-card {
+    @apply backdrop-blur-lg bg-black/30 p-6 rounded-xl border border-gray-800 hover:border-gray-700 transition-colors;
+  }
 }

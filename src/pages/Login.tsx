@@ -1,74 +1,99 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { LogIn } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 
-export const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(email, password);
-      navigate('/elections');
-    } catch (err) {
-      setError('Email ou mot de passe incorrect');
+      setError(null);
+      await login(data.email, data.password);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login failed:', err);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full space-y-8 p-8 holographic-card">
-        <div>
-          <h2 className="text-3xl font-bold text-center mb-8 neon-text">
-            Connexion
-          </h2>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen pt-16 flex items-center justify-center px-4"
+    >
+      <div className="max-w-md w-full backdrop-blur-lg bg-black/30 p-8 rounded-xl border border-gray-800">
+        <div className="flex items-center justify-center mb-8">
+          <LogIn className="h-12 w-12 text-blue-500" />
         </div>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-100 px-4 py-2 rounded">
-              {error}
-            </div>
-          )}
+        <h2 className="text-3xl font-bold text-center mb-8">Welcome Back</h2>
+        
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg text-red-500">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
-              Email
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              Email Address
             </label>
             <input
-              id="email"
+              {...register('email')}
               type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-black/50 border border-[#00ff88]/30 focus:border-[#00ff88] focus:ring focus:ring-[#00ff88]/20 transition"
+              className="form-input"
+              placeholder="your@email.com"
             />
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+            )}
           </div>
+
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-2">
-              Mot de passe
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              Password
             </label>
             <input
-              id="password"
+              {...register('password')}
               type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-black/50 border border-[#00ff88]/30 focus:border-[#00ff88] focus:ring focus:ring-[#00ff88]/20 transition"
+              className="form-input"
+              placeholder="••••••••"
             />
+            {errors.password && (
+              <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
+            )}
           </div>
+
           <button
             type="submit"
-            className="w-full neural-button flex items-center justify-center space-x-2"
+            className="w-full btn-primary"
           >
-            <LogIn className="h-5 w-5" />
-            <span>Se connecter</span>
+            Sign In
           </button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+export default Login;
